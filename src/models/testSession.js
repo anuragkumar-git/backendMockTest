@@ -9,6 +9,11 @@ const TestSessionSchema = new Schema({
   timedOut: { type: Boolean, default: false },
   score: Number,
   attempted: Number,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 11400
+  }
 });
 
 module.exports = mongoose.model('Session', TestSessionSchema);
