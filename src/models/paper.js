@@ -14,11 +14,12 @@ const QuestionSchema = new Schema({
   reflection_axis: String,
   statements: Schema.Types.Mixed,
   options: Schema.Types.Mixed,
-  passage_context: Schema.Types.Mixed,
+  passage_text: String,
   correct_answer_key: String,
   context_type: String,
   
-
+  
+  passage_context: Schema.Types.Mixed,
   section: String, //no ideaa
   question_text_gu: String,
   question_text_en: String,

@@ -63,8 +63,25 @@ const submitSession = async (req, res) => {
     let wrongCount = 0;
 
     const wrongQuestions = [];
+    const parts = {};
+    const partsAlpha = {}
 
     for (const q of questions) {
+      const part = String(q.part || "0");
+
+      if (!parts[part]) {
+        parts[part] = {
+          correctCountPart: 0,
+          wrongCountPart: 0,
+          totalCountPart: 0,
+          attemptedPart: 0,
+          unattemptedPart: 0,
+          scorePart: 0
+        }
+      }
+
+      parts[part].totalCountPart++;
+
       const qNum = String(q.question_number);
       const selected = answers[qNum];
       const correct =
@@ -77,18 +94,26 @@ const submitSession = async (req, res) => {
         selected !== null &&
         selected !== "";
 
-      if (isAttempted) attempted++;
+      if (isAttempted) {
+        attempted++;
+        parts[part].attemptedPart++;
+      }
 
-      if (!isAttempted) continue;
+      if (!isAttempted) {
+        parts[part].unattemptedPart++
+        continue
+      };
 
       if (String(selected) === String(correct)) {
         correctCount++;
+        parts[part].correctCountPart++
       } else {
         wrongCount++;
+        parts[part].wrongCountPart++
 
         wrongQuestions.push({
           question_number: q.question_number,
-          question_text: q.question_text_gu || q.question_text_en || q.question_text || null,
+          question_text: q.question_text || q.question_text_gu || q.question_text_en || null,
           expression: q.expression || null,
           options: q.options || {},
           selected,
@@ -98,6 +123,15 @@ const submitSession = async (req, res) => {
       }
     }
 
+    for (const p in parts) {
+      const part = parts[p];
+      part.scorePart = Number((part.correctCountPart - part.wrongCountPart * 0.25).toFixed(2));
+    }
+
+    for (const key in parts) {
+      const alpha = key === "1" ? "A" : key === "2" ? "B" : key
+      partsAlpha[alpha] = parts[key];
+    }
     const finalScore = Number((correctCount - wrongCount * 0.25).toFixed(2));
 
     session.finishedAt = now;
@@ -117,6 +151,7 @@ const submitSession = async (req, res) => {
       finalScore,
       wrongQuestions,
       timedOut,
+      parts: partsAlpha
     });
   } catch (err) {
     console.error(err);
@@ -124,4 +159,4 @@ const submitSession = async (req, res) => {
   }
 }
 
-module.exports ={startSession, submitSession}
+module.exports = { startSession, submitSession }
