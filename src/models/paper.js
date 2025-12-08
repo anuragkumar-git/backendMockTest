@@ -13,6 +13,7 @@ const QuestionSchema = new Schema({
   image_text: String,
   reflection_axis: String,
   statements: Schema.Types.Mixed,
+  conclusions: Schema.Types.Mixed,
   options: Schema.Types.Mixed,
   passage_text: String,
   correct_answer_key: String,
